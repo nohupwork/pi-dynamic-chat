@@ -1,61 +1,80 @@
 {
-  "$schema": "Chat mode sampling parameters",
-  "$note": "Edit this file to tune per-mode generation params. Changes apply on next message (no reload needed).",
-  "$note2": "Standard OpenAI params (temperature, top_p, top_k, min_p, presence_penalty, frequency_penalty, repetition_penalty) work on all backends. Extra fields are passed through for llama.cpp/Ollama compat.",
+  "$schema": "Chat mode configuration — prompts, sampling params, and constraints",
+  "$note": "Edit this file to customize modes. Prompt changes apply on next mode switch. Param changes apply immediately on next message.",
+
+  "tool_constraints": "\n\nYou have access to file tools (read, edit, write, grep, find, ls) so you can read, create, and search files.\n\nYou do NOT have access to bash/shell execution. If a task requires running commands, installing packages, or executing code, explain what would need to be done and guide the user instead.",
+
   "modes": {
     "writing": {
-      "temperature": 1.1,
-      "top_p": 0.95,
-      "top_k": 20,
-      "min_p": 0.0,
-      "presence_penalty": 0.1,
-      "frequency_penalty": 0.05,
-      "repetition_penalty": 1.0
+      "prompt": "You are a writing and editing assistant. Help draft, revise, and polish prose. Focus on clarity, tone, structure, and style. Suggest concrete improvements — don't just say something is \"good\" or \"bad\". Adapt to the user's preferred voice and format.",
+      "params": {
+        "temperature": 1.1,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "presence_penalty": 0.1,
+        "frequency_penalty": 0.05,
+        "repetition_penalty": 1.0
+      }
     },
     "analysis": {
-      "temperature": 0.3,
-      "top_p": 0.90,
-      "top_k": 20,
-      "min_p": 0.0,
-      "presence_penalty": 0.5,
-      "frequency_penalty": 0.05,
-      "repetition_penalty": 1.1
+      "prompt": "You are an analysis and review assistant. Critique code, documents, or arguments. Spot issues, suggest improvements, and break down complex material. Be thorough and skeptical — look for edge cases, assumptions, and weaknesses. Structure your findings clearly.",
+      "params": {
+        "temperature": 0.3,
+        "top_p": 0.90,
+        "top_k": 20,
+        "min_p": 0.0,
+        "presence_penalty": 0.5,
+        "frequency_penalty": 0.05,
+        "repetition_penalty": 1.1
+      }
     },
     "research": {
-      "temperature": 0.7,
-      "top_p": 0.95,
-      "top_k": 20,
-      "min_p": 0.0,
-      "presence_penalty": 0.0,
-      "frequency_penalty": 0.0,
-      "repetition_penalty": 1.0
+      "prompt": "You are a research and knowledge assistant. Answer questions thoroughly, explain complex topics clearly, compare options with pros and cons, and summarize long texts. When uncertain, say so and explain what would help clarify. Break down answers into structured sections when useful.",
+      "params": {
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "presence_penalty": 0.0,
+        "frequency_penalty": 0.0,
+        "repetition_penalty": 1.0
+      }
     },
     "planning": {
-      "temperature": 0.6,
-      "top_p": 0.95,
-      "top_k": 20,
-      "min_p": 0.0,
-      "presence_penalty": 0.0,
-      "frequency_penalty": 0.02,
-      "repetition_penalty": 1.0
+      "prompt": "You are a planning and structuring assistant. Help organize thoughts, break down projects, create outlines and roadmaps. Turn vague ideas into concrete steps. Identify dependencies, risks, and milestones. Use lists and structured formats.",
+      "params": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "presence_penalty": 0.0,
+        "frequency_penalty": 0.02,
+        "repetition_penalty": 1.0
+      }
     },
     "chat": {
-      "temperature": 1.0,
-      "top_p": 0.95,
-      "top_k": 20,
-      "min_p": 0.0,
-      "presence_penalty": 0.0,
-      "frequency_penalty": 0.0,
-      "repetition_penalty": 1.0
+      "prompt": "You are a helpful general-purpose assistant. Answer questions, solve problems, brainstorm ideas, and have natural conversations. Be direct and practical — no unnecessary preamble.",
+      "params": {
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "presence_penalty": 0.0,
+        "frequency_penalty": 0.0,
+        "repetition_penalty": 1.0
+      }
     },
     "custom": {
-      "temperature": 0.7,
-      "top_p": 0.90,
-      "top_k": 20,
-      "min_p": 0.0,
-      "presence_penalty": 0.0,
-      "frequency_penalty": 0.0,
-      "repetition_penalty": 1.0
+      "params": {
+        "temperature": 0.7,
+        "top_p": 0.90,
+        "top_k": 20,
+        "min_p": 0.0,
+        "presence_penalty": 0.0,
+        "frequency_penalty": 0.0,
+        "repetition_penalty": 1.0
+      }
     }
   }
 }

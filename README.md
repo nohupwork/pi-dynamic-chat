@@ -4,6 +4,9 @@ Pre-built "chat" modes that disable bash, keep file tools, replace the system
 prompt, and inject per-mode sampling parameters into every provider request —
 no model reload needed.
 
+Prompts and params live in a sidecar JSON file so they can be tuned without
+editing code.
+
 ## Install
 
 Copy both files into your Pi extensions directory:
@@ -37,8 +40,51 @@ Then restart Pi or run `/reload`.
 
 ## Tuning
 
-Edit `chat-mode.json` to adjust per-mode sampling parameters. Changes take
-effect immediately on the next message — no reload needed.
+Edit `chat-mode.json` to customize modes.
+
+```json
+{
+  "tool_constraints": "\n\nYou have access to file tools...",
+  "modes": {
+    "writing": {
+      "prompt": "You are a writing and editing assistant...",
+      "params": {
+        "temperature": 1.1,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0.0,
+        "presence_penalty": 0.1,
+        "frequency_penalty": 0.05,
+        "repetition_penalty": 1.0
+      }
+    }
+  }
+}
+```
+
+- **Prompt changes** apply on next mode switch (cached at enable time)
+- **Param changes** apply immediately on next message (read fresh each request)
+- The `tool_constraints` block is appended to every mode prompt automatically
+- The `custom` mode has no default prompt — it uses whatever instruction you provide
+
+### Adding New Modes
+
+Add a new entry under `modes`:
+
+```json
+"coding": {
+  "prompt": "You are a coding assistant...",
+  "params": {
+    "temperature": 0.5,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0,
+    "repetition_penalty": 1.0
+  }
+}
+```
 
 ### Supported Parameters
 
@@ -60,22 +106,6 @@ effect immediately on the next message — no reload needed.
 
 Any extra fields in the JSON are passed through to the provider payload.
 Backends that don't recognize them will silently ignore them.
-
-### Defaults
-
-If `chat-mode.json` is missing or a mode has no entry, these defaults are used:
-
-```json
-{
-  "temperature": 0.7,
-  "top_p": 0.9,
-  "top_k": 20,
-  "min_p": 0.0,
-  "presence_penalty": 0.0,
-  "frequency_penalty": 0.0,
-  "repetition_penalty": 1.0
-}
-```
 
 ## How It Works
 

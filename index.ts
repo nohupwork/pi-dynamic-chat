@@ -5,8 +5,8 @@
  * prompt, and inject per-mode sampling parameters (temperature, top_p, etc.) into
  * every provider request — no model reload needed.
  *
- * Sampling params are loaded from a sidecar JSON file (chat-mode.json) so they
- * can be tuned without editing code.
+ * All prompts and params are loaded from a sidecar JSON file (chat-mode.json) so
+ * they can be tuned without editing code.
  *
  * Usage:
  *   /chat              Show mode selector
@@ -44,13 +44,19 @@ interface SamplingParams {
   [key: string]: number | undefined;
 }
 
+interface ModeConfig {
+  prompt?: string;
+  params?: SamplingParams;
+}
+
 interface ConfigFile {
-  modes?: Record<string, SamplingParams>;
+  tool_constraints?: string;
+  modes?: Record<string, ModeConfig>;
 }
 
 // ── Defaults ─────────────────────────────────────────────────────────────────
 // Fallback values when config file is missing or a mode has no entry.
-// Based on Qwen 3.6 27B official recommendations + user's llama.cpp defaults.
+// Based on Qwen 3.6 27B official recommendations.
 
 const DEFAULT_PARAMS: SamplingParams = {
   temperature: 0.7,
@@ -72,37 +78,26 @@ function loadConfig(): ConfigFile {
     const raw = readFileSync(CONFIG_PATH, "utf-8");
     return JSON.parse(raw) as ConfigFile;
   } catch (err) {
-    // Swallow — extension still works with hardcoded defaults
     console.error(`[chat-mode] Failed to parse ${CONFIG_PATH}:`, err);
     return { modes: {} };
   }
 }
 
 const config = loadConfig();
-const modeParams: Record<string, SamplingParams> = config.modes ?? {};
+const toolConstraints = config.tool_constraints ?? "";
+const modeConfigs: Record<string, ModeConfig> = config.modes ?? {};
 
 function getParamsForMode(mode: string): SamplingParams {
-  return modeParams[mode] ?? DEFAULT_PARAMS;
+  return modeConfigs[mode]?.params ?? DEFAULT_PARAMS;
 }
 
-// ── Mode Prompts ─────────────────────────────────────────────────────────────
+function getPromptForMode(mode: string): string | undefined {
+  return modeConfigs[mode]?.prompt;
+}
 
-// Shared constraints appended to every mode prompt
-const TOOL_CONSTRAINTS = `\n\nYou have access to file tools (read, edit, write, grep, find, ls) so you can read, create, and search files.\n\nYou do NOT have access to bash/shell execution. If a task requires running commands, installing packages, or executing code, explain what would need to be done and guide the user instead.`;
-
-const MODE_PROMPTS: Record<string, string> = {
-  research: `You are a research and knowledge assistant. Answer questions thoroughly, explain complex topics clearly, compare options with pros and cons, and summarize long texts. When uncertain, say so and explain what would help clarify. Break down answers into structured sections when useful.${TOOL_CONSTRAINTS}`,
-
-  writing: `You are a writing and editing assistant. Help draft, revise, and polish prose. Focus on clarity, tone, structure, and style. Suggest concrete improvements — don't just say something is "good" or "bad". Adapt to the user's preferred voice and format.${TOOL_CONSTRAINTS}`,
-
-  analysis: `You are an analysis and review assistant. Critique code, documents, or arguments. Spot issues, suggest improvements, and break down complex material. Be thorough and skeptical — look for edge cases, assumptions, and weaknesses. Structure your findings clearly.${TOOL_CONSTRAINTS}`,
-
-  planning: `You are a planning and structuring assistant. Help organize thoughts, break down projects, create outlines and roadmaps. Turn vague ideas into concrete steps. Identify dependencies, risks, and milestones. Use lists and structured formats.${TOOL_CONSTRAINTS}`,
-
-  chat: `You are a helpful general-purpose assistant. Answer questions, solve problems, brainstorm ideas, and have natural conversations. Be direct and practical — no unnecessary preamble.${TOOL_CONSTRAINTS}`,
-};
-
-const MODE_NAMES = Object.keys(MODE_PROMPTS);
+const MODE_NAMES = Object.keys(modeConfigs).filter(
+  (name) => name !== "custom" && modeConfigs[name]?.prompt,
+);
 
 // Tools to keep enabled in chat mode (everything except bash)
 const CHAT_TOOLS = ["read", "edit", "write", "grep", "find", "ls"];
@@ -111,6 +106,7 @@ const CHAT_TOOLS = ["read", "edit", "write", "grep", "find", "ls"];
 
 export default function chatModeExtension(pi: ExtensionAPI) {
   let activeMode: string | undefined;
+  let activePrompt: string | undefined;
   let customInstruction: string | undefined;
   let originalTools: string[] | undefined;
 
@@ -125,6 +121,14 @@ export default function chatModeExtension(pi: ExtensionAPI) {
   async function enableMode(ctx: ExtensionContext, mode: string, instruction?: string): Promise<void> {
     activeMode = mode;
     customInstruction = instruction;
+
+    // Resolve the system prompt: custom instruction > config prompt
+    if (instruction) {
+      activePrompt = instruction + toolConstraints;
+    } else {
+      const modePrompt = getPromptForMode(mode);
+      activePrompt = modePrompt ? modePrompt + toolConstraints : undefined;
+    }
 
     // Save original tools on first enable
     if (originalTools === undefined) {
@@ -150,6 +154,7 @@ export default function chatModeExtension(pi: ExtensionAPI) {
 
     const prev = activeMode;
     activeMode = undefined;
+    activePrompt = undefined;
     customInstruction = undefined;
 
     if (originalTools) {
@@ -166,8 +171,10 @@ export default function chatModeExtension(pi: ExtensionAPI) {
   async function showSelector(ctx: ExtensionContext): Promise<void> {
     const items = [
       ...MODE_NAMES.map((name) => {
-        const params = getParamsForMode(name);
-        return `${name} (temp=${params.temperature}) — ${MODE_PROMPTS[name].slice(0, 60)}...`;
+        const modeConfig = modeConfigs[name];
+        const params = modeConfig?.params ?? DEFAULT_PARAMS;
+        const promptPreview = modeConfig?.prompt?.slice(0, 60) ?? "no prompt";
+        return `${name} (temp=${params.temperature}) — ${promptPreview}...`;
       }),
       "custom — provide your own instruction",
     ];
@@ -188,7 +195,7 @@ export default function chatModeExtension(pi: ExtensionAPI) {
   // ── Commands ─────────────────────────────────────────────────────────────
 
   pi.registerCommand("chat", {
-    description: "Switch chat mode (research, writing, analysis, planning, chat). No args shows selector.",
+    description: "Switch chat mode. No args shows selector.",
     getArgumentCompletions: (prefix) => {
       const options = [...MODE_NAMES, "off"];
       const filtered = options.filter((o) => o.startsWith(prefix));
@@ -201,9 +208,10 @@ export default function chatModeExtension(pi: ExtensionAPI) {
         await showSelector(ctx);
       } else if (arg.toLowerCase() === "off") {
         await disableMode(ctx);
-      } else if (MODE_NAMES.includes(arg.toLowerCase())) {
+      } else if (modeConfigs[arg.toLowerCase()] || arg.toLowerCase() === "custom") {
         await enableMode(ctx, arg.toLowerCase());
       } else {
+        // Treat as custom instruction
         await enableMode(ctx, "custom", arg);
       }
     },
@@ -212,16 +220,9 @@ export default function chatModeExtension(pi: ExtensionAPI) {
   // ── Events ───────────────────────────────────────────────────────────────
 
   // Replace system prompt when a mode is active
-  pi.on("before_agent_start", async (event) => {
-    if (!activeMode) return undefined;
-
-    if (activeMode === "custom" && customInstruction) {
-      return { systemPrompt: customInstruction + TOOL_CONSTRAINTS };
-    }
-    if (MODE_PROMPTS[activeMode]) {
-      return { systemPrompt: MODE_PROMPTS[activeMode] };
-    }
-    return undefined;
+  pi.on("before_agent_start", async () => {
+    if (!activeMode || !activePrompt) return undefined;
+    return { systemPrompt: activePrompt };
   });
 
   // Inject sampling parameters into every provider request
@@ -230,7 +231,7 @@ export default function chatModeExtension(pi: ExtensionAPI) {
 
     const params = getParamsForMode(activeMode);
 
-    // Only include defined values — let the provider use its defaults for anything omitted
+    // Only include defined values — let the provider use defaults for anything omitted
     const overrides: Record<string, number> = {};
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined) {
