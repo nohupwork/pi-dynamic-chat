@@ -1,0 +1,25 @@
+{
+  "name": "pi-dynamic-chat",
+  "version": "1.0.0",
+  "description": "Pre-built \"chat\" modes that disable bash, keep file tools, replace the system prompt, and inject per-mode sampling parameters into every provider request — no model reload needed.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nohupwork/pi-dynamic-chat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nohupwork/pi-dynamic-chat/issues"
+  },
+  "homepage": "https://github.com/nohupwork/pi-dynamic-chat#readme",
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.74.0",
+    "typescript": "^6.0.3"
+  }
+}
