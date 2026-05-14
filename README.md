@@ -13,8 +13,8 @@ Copy into a subdirectory under your Pi extensions folder so the JSON sidecar
 stays next to the code:
 
 ```bash
-mkdir -p ~/.pi/agent/extensions/chat-mode
-cp index.ts chat-mode.json ~/.pi/agent/extensions/chat-mode/
+mkdir -p ~/.pi/agent/extensions/pi-dynamic-chat
+cp index.ts config.json ~/.pi/agent/extensions/pi-dynamic-chat/
 ```
 
 Then restart Pi or run `/reload`.
@@ -43,7 +43,7 @@ To update, copy the new files over the same way and `/reload`.
 
 ## Tuning
 
-Edit `chat-mode.json` to customize modes.
+Edit `config.json` to customize modes.
 
 ```json
 {

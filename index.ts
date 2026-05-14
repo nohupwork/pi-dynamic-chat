@@ -5,7 +5,7 @@
  * prompt, and inject per-mode sampling parameters (temperature, top_p, etc.) into
  * every provider request — no model reload needed.
  *
- * All prompts and params are loaded from a sidecar JSON file (chat-mode.json) so
+ * All prompts and params are loaded from a sidecar JSON file (config.json) so
  * they can be tuned without editing code.
  *
  * Usage:
@@ -29,7 +29,7 @@ import { fileURLToPath } from "node:url";
 // ── Paths ────────────────────────────────────────────────────────────────────
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const CONFIG_PATH = join(__dirname, "chat-mode.json");
+const CONFIG_PATH = join(__dirname, "config.json");
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,7 +78,7 @@ function loadConfig(): ConfigFile {
     const raw = readFileSync(CONFIG_PATH, "utf-8");
     return JSON.parse(raw) as ConfigFile;
   } catch (err) {
-    console.error(`[chat-mode] Failed to parse ${CONFIG_PATH}:`, err);
+    console.error(`[pi-dynamic-chat] Failed to parse ${CONFIG_PATH}:`, err);
     return { modes: {} };
   }
 }
@@ -112,9 +112,9 @@ export default function chatModeExtension(pi: ExtensionAPI) {
 
   function updateStatus(ctx: ExtensionContext) {
     if (activeMode) {
-      ctx.ui.setStatus("chat-mode", ctx.ui.theme.fg("accent", `mode:${activeMode}`));
+      ctx.ui.setStatus("pi-dynamic-chat", ctx.ui.theme.fg("accent", `mode:${activeMode}`));
     } else {
-      ctx.ui.setStatus("chat-mode", undefined);
+      ctx.ui.setStatus("pi-dynamic-chat", undefined);
     }
   }
 
