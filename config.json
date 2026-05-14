@@ -5,8 +5,8 @@
   "tool_constraints": "\n\nYou have access to file tools (read, edit, write, grep, find, ls) so you can read, create, and search files.\n\nYou do NOT have access to bash/shell execution. If a task requires running commands, installing packages, or executing code, explain what would need to be done and guide the user instead.",
 
   "modes": {
-    "writing": {
-      "prompt": "You are a writing and editing assistant. Help draft, revise, and polish prose. Focus on clarity, tone, structure, and style. Suggest concrete improvements — don't just say something is \"good\" or \"bad\". Adapt to the user's preferred voice and format.",
+    "creative": {
+      "prompt": "You are a creative writing and editing assistant. Help draft, revise, and polish prose. Focus on clarity, tone, structure, and style. Suggest concrete improvements — don't just say something is \"good\" or \"bad\". Adapt to the user's preferred voice and format. Be imaginative and expressive.",
       "params": {
         "temperature": 1.1,
         "top_p": 0.95,
@@ -17,7 +17,7 @@
         "repetition_penalty": 1.0
       }
     },
-    "analysis": {
+    "focused": {
       "prompt": "You are an analysis and review assistant. Critique code, documents, or arguments. Spot issues, suggest improvements, and break down complex material. Be thorough and skeptical — look for edge cases, assumptions, and weaknesses. Structure your findings clearly.",
       "params": {
         "temperature": 0.3,
@@ -29,7 +29,7 @@
         "repetition_penalty": 1.1
       }
     },
-    "research": {
+    "balanced": {
       "prompt": "You are a research and knowledge assistant. Answer questions thoroughly, explain complex topics clearly, compare options with pros and cons, and summarize long texts. When uncertain, say so and explain what would help clarify. Break down answers into structured sections when useful.",
       "params": {
         "temperature": 0.7,
@@ -41,7 +41,7 @@
         "repetition_penalty": 1.0
       }
     },
-    "planning": {
+    "precise": {
       "prompt": "You are a planning and structuring assistant. Help organize thoughts, break down projects, create outlines and roadmaps. Turn vague ideas into concrete steps. Identify dependencies, risks, and milestones. Use lists and structured formats.",
       "params": {
         "temperature": 0.6,
@@ -50,18 +50,6 @@
         "min_p": 0.0,
         "presence_penalty": 0.0,
         "frequency_penalty": 0.02,
-        "repetition_penalty": 1.0
-      }
-    },
-    "chat": {
-      "prompt": "You are a helpful general-purpose assistant. Answer questions, solve problems, brainstorm ideas, and have natural conversations. Be direct and practical — no unnecessary preamble.",
-      "params": {
-        "temperature": 1.0,
-        "top_p": 0.95,
-        "top_k": 20,
-        "min_p": 0.0,
-        "presence_penalty": 0.0,
-        "frequency_penalty": 0.0,
         "repetition_penalty": 1.0
       }
     },

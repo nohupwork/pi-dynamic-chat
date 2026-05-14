@@ -1,10 +1,10 @@
-# Chat Mode Extension for Pi
+# Dynamic Chat Extension for Pi
 
 Pre-built "chat" modes that disable bash, keep file tools, replace the system
 prompt, and inject per-mode sampling parameters into every provider request —
 no model reload needed.
 
-Prompts and params live in a sidecar JSON file so they can be tuned without
+All prompts and params live in a sidecar JSON file so they can be tuned without
 editing code.
 
 ## Install
@@ -19,26 +19,23 @@ cp index.ts config.json ~/.pi/agent/extensions/pi-dynamic-chat/
 
 Then restart Pi or run `/reload`.
 
-To update, copy the new files over the same way and `/reload`.
-
 ## Usage
 
 ```
-/dynamic-chat              Show mode selector
-/dynamic-chat off          Disable chat mode, restore all tools
-/dynamic-chat <name>       Switch to a named mode
-/dynamic-chat "custom..."  Enable "custom" mode with your own instruction
+/dynamic-chat         Show mode selector
+/dynamic-chat off     Disable chat mode, restore all tools
+/dynamic-chat <name>  Switch to a named mode
+/dynamic-chat "..."   Enable "custom" mode with your own instruction
 ```
 
 ### Modes
 
 | Mode | Temperature | Top_P | Description |
 |------|-------------|-------|-------------|
-| `writing` | 1.1 | 0.95 | Creative, varied prose |
-| `analysis` | 0.3 | 0.90 | Deterministic, precise |
-| `research` | 0.7 | 0.95 | Factual, thorough |
-| `planning` | 0.6 | 0.95 | Structured, concrete |
-| `chat` | 1.0 | 0.95 | Conversational, general |
+| `creative` | 1.1 | 0.95 | Creative, imaginative prose |
+| `focused` | 0.3 | 0.90 | Deterministic analysis and review |
+| `balanced` | 0.7 | 0.95 | Research and general knowledge |
+| `precise` | 0.6 | 0.95 | Structured planning and roadmaps |
 | `custom` | 0.7 | 0.90 | Your own instruction |
 
 ## Tuning
@@ -49,8 +46,8 @@ Edit `config.json` to customize modes.
 {
   "tool_constraints": "\n\nYou have access to file tools...",
   "modes": {
-    "writing": {
-      "prompt": "You are a writing and editing assistant...",
+    "creative": {
+      "prompt": "You are a creative writing assistant...",
       "params": {
         "temperature": 1.1,
         "top_p": 0.95,
@@ -75,8 +72,8 @@ Edit `config.json` to customize modes.
 Add a new entry under `modes`:
 
 ```json
-"coding": {
-  "prompt": "You are a coding assistant...",
+"my-mode": {
+  "prompt": "You are a ...",
   "params": {
     "temperature": 0.5,
     "top_p": 0.95,
