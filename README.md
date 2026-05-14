@@ -9,14 +9,17 @@ editing code.
 
 ## Install
 
-Copy both files into your Pi extensions directory:
+Copy into a subdirectory under your Pi extensions folder so the JSON sidecar
+stays next to the code:
 
 ```bash
-cp index.ts ~/.pi/agent/extensions/chat-mode.ts
-cp chat-mode.json ~/.pi/agent/extensions/chat-mode.json
+mkdir -p ~/.pi/agent/extensions/chat-mode
+cp index.ts chat-mode.json ~/.pi/agent/extensions/chat-mode/
 ```
 
 Then restart Pi or run `/reload`.
+
+To update, copy the new files over the same way and `/reload`.
 
 ## Usage
 
