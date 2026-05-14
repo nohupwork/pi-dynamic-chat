@@ -9,10 +9,10 @@
  * they can be tuned without editing code.
  *
  * Usage:
- *   /chat              Show mode selector
- *   /chat off          Disable chat mode, restore all tools
- *   /chat <name>       Switch to a named mode
- *   /chat "custom..."  Enable "custom" mode with your own instruction
+ *   /dynamic-chat         Show mode selector
+ *   /dynamic-chat off     Disable chat mode, restore all tools
+ *   /dynamic-chat <name>  Switch to a named mode
+ *   /dynamic-chat "..."   Enable "custom" mode with your own instruction
  *
  * When active:
  * - bash tool is disabled
@@ -194,7 +194,7 @@ export default function chatModeExtension(pi: ExtensionAPI) {
 
   // ── Commands ─────────────────────────────────────────────────────────────
 
-  pi.registerCommand("chat", {
+  pi.registerCommand("dynamic-chat", {
     description: "Switch chat mode. No args shows selector.",
     getArgumentCompletions: (prefix) => {
       const options = [...MODE_NAMES, "off"];

@@ -24,10 +24,10 @@ To update, copy the new files over the same way and `/reload`.
 ## Usage
 
 ```
-/chat              Show mode selector
-/chat off          Disable chat mode, restore all tools
-/chat <name>       Switch to a named mode
-/chat "custom..."  Enable "custom" mode with your own instruction
+/dynamic-chat              Show mode selector
+/dynamic-chat off          Disable chat mode, restore all tools
+/dynamic-chat <name>       Switch to a named mode
+/dynamic-chat "custom..."  Enable "custom" mode with your own instruction
 ```
 
 ### Modes
