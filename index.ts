@@ -177,10 +177,16 @@ export default function chatModeExtension(pi: ExtensionAPI) {
         return `${name} (temp=${params.temperature}) — ${promptPreview}...`;
       }),
       "custom — provide your own instruction",
+      "off — restore all tools and default settings",
     ];
 
     const choice = await ctx.ui.select("Select chat mode", items);
     if (!choice) return;
+
+    if (choice.startsWith("off")) {
+      await disableMode(ctx);
+      return;
+    }
 
     if (choice.startsWith("custom")) {
       const instruction = await ctx.ui.input("Custom instruction", "You are a ...");
